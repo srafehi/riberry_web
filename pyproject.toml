@@ -7,9 +7,8 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.6"
-fastapi = "^0.38.1"
-graphene = "^2.1"
 riberry = "^0.10.7"
+fastapi = {version = "^0.38.1",extras = ["all"]}
 
 [tool.poetry.dev-dependencies]
 

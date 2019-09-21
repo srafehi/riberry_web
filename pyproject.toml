@@ -6,8 +6,8 @@ authors = ["Your Name <you@example.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.6"
-riberry = "^0.10.8"
+python = "^3.7"
+riberry = "^0.10.10"
 fastapi = {version = "^0.38.1",extras = ["all"]}
 
 [tool.poetry.dev-dependencies]

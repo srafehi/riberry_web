@@ -3,6 +3,7 @@ import riberry
 
 
 class GetAccessToken(graphene.relay.ClientIDMutation):
+
     class Input:
         username = graphene.String(required=True)
         password = graphene.String(required=True)
@@ -16,4 +17,4 @@ class GetAccessToken(graphene.relay.ClientIDMutation):
             password=input_data['password']
         )
         riberry.model.conn.commit()
-        return GetAccessToken(access_token=access_token)
+        return cls(access_token=access_token)

@@ -2,13 +2,13 @@
 name = "riberry_web"
 version = "0.1.1"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Shady Rafehi <shadyrafehi@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-riberry = "^0.10.10"
-fastapi = {version = "^0.38.1",extras = ["all"]}
+riberry = "^0.10.21"
+fastapi = {version = "^0.45.0", extras = ["all"]}
 
 [tool.poetry.dev-dependencies]
 

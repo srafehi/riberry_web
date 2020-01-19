@@ -1,4 +1,7 @@
-from sqlalchemy.orm import RelationshipProperty
+from typing import Optional
+
+from sqlalchemy import Column
+from sqlalchemy.orm import RelationshipProperty, ColumnProperty
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from .wrapper_graphene import ModelType
@@ -31,9 +34,23 @@ class SqlaModelMember:
     def name(self):
         return self.member.key
 
+    def _sqla_column(self) -> Optional[Column]:
+        if isinstance(self.member.prop, ColumnProperty):
+            return list(self.member.prop.columns)[0]
+        elif isinstance(self.member.prop, RelationshipProperty) and len(self.member.prop.local_columns) == 1:
+            return list(self.member.prop.local_columns)[0]
+
     @property
     def type(self):
-        return self.member.prop.columns[0].type
+        return self._sqla_column().type
+
+    @property
+    def nullable(self):
+        return self._sqla_column().nullable
+
+    @property
+    def default(self):
+        return self._sqla_column().default
 
     @property
     def description(self):
@@ -46,7 +63,7 @@ class SqlaModelMember:
 
     @property
     def target_to_source_member(self) -> 'SqlaModelMember':
-        if self.is_relationship():
+        if self.is_relationship() and self.member.property.back_populates:
             return SqlaModelMember(
                 member=getattr(self.target.model, self.member.property.back_populates),
                 model=self.target
@@ -57,3 +74,6 @@ class SqlaModelMember:
 
     def is_list(self):
         return self.member.property.uselist
+
+    def __repr__(self):
+        return f'SqlaModelMember(member={self.member})'

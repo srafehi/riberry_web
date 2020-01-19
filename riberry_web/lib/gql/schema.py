@@ -1,5 +1,14 @@
 import graphene
+import riberry
 
 from .objects import Query, Mutation
 
-schema = graphene.Schema(query=Query, mutation=Mutation)
+
+class RiberrySchema(graphene.Schema):
+
+    def execute(self, *args, **kwargs):
+        with riberry.model.conn:
+            return super().execute(*args, **kwargs)
+
+
+schema = RiberrySchema(query=Query, mutation=Mutation)

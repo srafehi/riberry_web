@@ -20,4 +20,10 @@ app.mount('/', StaticFiles(directory=module_path / 'webapp', html=True), name='s
 
 
 def main(host: str = '127.0.0.1', port: int = 5445, log_level: str = 'info', **kwargs):
-    uvicorn.run(app, host=host, port=port, log_level=log_level, **kwargs)
+    uvicorn.run(
+        app='riberry_web.app:app' if kwargs.get('reload') else app,
+        host=host,
+        port=port,
+        log_level=log_level,
+        **kwargs,
+    )

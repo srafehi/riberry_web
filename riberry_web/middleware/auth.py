@@ -1,7 +1,9 @@
 import riberry
+from fastapi import HTTPException, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
+from http import HTTPStatus
 
 
 class RiberryAuthMiddleware(BaseHTTPMiddleware):
@@ -11,6 +13,8 @@ class RiberryAuthMiddleware(BaseHTTPMiddleware):
         try:
             self.auth(request=request)
             return await call_next(request)
+        except HTTPException as exc:
+            return Response(status_code=exc.status_code)
         finally:
             riberry.policy.context.store.reset(token=token)
 
@@ -18,19 +22,13 @@ class RiberryAuthMiddleware(BaseHTTPMiddleware):
     def auth(request: Request):
         """ Sets the current Riberry policy context """
 
-        user = None
-        if 'token' in request.cookies:
+        user = riberry.model.auth.User()
+        if request.cookies.get('token'):
             token = request.cookies['token']
             try:
-                payload = riberry.model.auth.AuthToken.verify(token)
-                user = riberry.model.auth.User.query().filter_by(username=payload['subject']).one()
-            except Exception:
-                raise
+                user = riberry.model.auth.UserToken.from_api_key(api_key=token).user
+            except riberry.exc.InvalidApiKeyError:
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED.value, detail=HTTPStatus.UNAUTHORIZED.phrase)
 
-        riberry.policy.context.configure(
-            subject=user,
-            environment=None,
-            policy_engine=riberry.config.config.policies.provider
-        )
-
+        riberry.policy.context.configure(subject=user, environment=None)
         return user

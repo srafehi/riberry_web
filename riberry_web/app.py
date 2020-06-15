@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.graphql import GraphQLApp
 from starlette.staticfiles import StaticFiles
 
-from .lib.gql.schema import schema
+from .gql.schema import schema
 from .middleware.auth import RiberryAuthMiddleware
 from .middleware.database import RiberryDatabaseMiddleware
 from .riberry.policy_context import apply_policy_context_store

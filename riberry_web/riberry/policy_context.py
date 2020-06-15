@@ -6,21 +6,17 @@ from riberry.policy.store import PolicyContextStore
 
 class ContextVarPolicyContextStore(PolicyContextStore):
     _store: ContextVar[dict] = ContextVar('store', default=None)
+    __DEFAULT = {'enabled': False}
 
     @property
     def store_dict(self):
         return self._store.get()
 
     def init(self):
-        return self._store.set({'_first_load': True})
+        return self._store.set(dict(self.__DEFAULT))
 
     def get(self, item, default=None):
-        if self.store_dict['_first_load'] and self.store_dict['subject']:
-            self.store_dict['_first_load'] = False
-            self.store_dict['subject'] = riberry.model.auth.User.query().filter_by(
-                id=self.store_dict['subject'].id,
-            ).one()
-        return self._store.get()[item]
+        return (self._store.get() or self.__DEFAULT)[item]
 
     def set(self, item, value):
         self._store.get()[item] = value
